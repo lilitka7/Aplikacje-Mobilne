@@ -1,5 +1,6 @@
 package com.example.game
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
@@ -7,12 +8,23 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import com.example.game.sql.DBHelper
 import kotlin.random.Random
 
 class MainActivity : AppCompatActivity() {
     private var count: Int = 0
     private var score: Int = 0
     private var myRandom:Int = 0
+
+    lateinit var enterNumber: EditText
+    lateinit var mainBtn: Button
+    lateinit var restart: Button
+    lateinit var btnScore: Button
+    lateinit var countMy: TextView
+    lateinit var scoreMy: TextView
+
+    var nick = ""
+    val db = DBHelper(this)
 
     private fun getRandom(){
         myRandom = Random.nextInt(0, 20)
@@ -26,14 +38,14 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        score = getPoints()
-        val enterNumber = findViewById<EditText>(R.id.enterNumber)
-        val mainBtn = findViewById<Button>(R.id.main_btn)
-        val restart = findViewById<Button>(R.id.restart)
-        val suma = findViewById<Button>(R.id.suma)
-        val countMy = findViewById<TextView>(R.id.count_my)
-        val scoreMy = findViewById<TextView>(R.id.score_my)
+        nick = intent.getStringExtra("user").toString()
+        score = db.getPoints(nick)
+        enterNumber = findViewById<EditText>(R.id.enterNumber)
+        mainBtn = findViewById<Button>(R.id.main_btn)
+        restart = findViewById<Button>(R.id.restart)
+        btnScore = findViewById<Button>(R.id.scoreboard_button)
+        countMy = findViewById<TextView>(R.id.count_my)
+        scoreMy = findViewById<TextView>(R.id.score_my)
 
         scoreMy.text = score.toString()
         countMy.text = count.toString()
@@ -82,7 +94,7 @@ class MainActivity : AppCompatActivity() {
                         in (5..6) -> score += 2
                         in (7..10) -> score += 1
                     }
-                        setPoints(score)
+                        db.setPoints(nick,score)
                         scoreMy.text = score.toString()
                         start()
                         countMy.text = count.toString()
@@ -95,12 +107,21 @@ class MainActivity : AppCompatActivity() {
             countMy.text =count.toString()
         }
 
-        suma.setOnClickListener{
-            setPoints(0)
-            score = 0
-            scoreMy.text = score.toString()
+        btnScore.setOnClickListener{
+            Thread() {
+                run {
+                    Thread.sleep(100)
+                }
+                runOnUiThread() {
+                    val intent = Intent(this, ScoreboardActivity::class.java)
+                    startActivity(intent)
+                    this.onPause()
+                }
+            }.start()
         }
-    }
+        scoreMy.text = score.toString()
+        }
+
     private fun showAlert(message : String, title : String) {
         val builder = AlertDialog.Builder(this@MainActivity)
         builder.setTitle(title)
@@ -110,15 +131,18 @@ class MainActivity : AppCompatActivity() {
         dialog.show()
     }
 
-    private fun setPoints(score : Int) {
-        val sharedScore = this.getSharedPreferences("com.example.game.shared",0)
-        val edit = sharedScore.edit()
-        edit.putInt("score", score)
-        edit.apply()
-    }
+//    private fun setPoints(score : Int) {
+//        val sharedScore = this.getSharedPreferences("com.example.game.shared",0)
+//        val edit = sharedScore.edit()
+//        edit.putInt("score", score)
+//        edit.apply()
+//    }
+//
+//    private fun getPoints() : Int {
+//        val sharedScore = this.getSharedPreferences("com.example.game.shared",0)
+//        return sharedScore.getInt("score", 0)
+//    }
 
-    private fun getPoints() : Int {
-        val sharedScore = this.getSharedPreferences("com.example.game.shared",0)
-        return sharedScore.getInt("score", 0)
-    }
 }
+
+

@@ -94,14 +94,13 @@
         />
 
     <Button
-        android:id="@+id/suma"
+        android:id="@+id/scoreboard_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/restart"
-        android:layout_marginTop="28sp"
         android:layout_marginHorizontal="120sp"
-        android:text="Restart sumy punktów"
-        />
+        android:layout_marginTop="28sp"
+        android:text="Lista rankingowa" />
 
 
     <EditText

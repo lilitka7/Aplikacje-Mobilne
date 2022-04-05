@@ -13,7 +13,7 @@ class SplashScreen : AppCompatActivity() {
                 Thread.sleep(3000)
             }
             runOnUiThread(){
-                val intent = Intent(this, MainActivity::class.java)
+                val intent = Intent(this, LoginActivity::class.java)
                 startActivity(intent)
                 finish()
             }
